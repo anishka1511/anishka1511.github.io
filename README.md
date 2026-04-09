@@ -73,6 +73,8 @@ Edit `src/portfolioData.js`:
 
 - This project currently uses static data from `src/portfolioData.js`.
 - Contact form is UI-only and does not send data to a backend yet.
+- When deploying to GitHub Pages, publish the built `dist/` folder, not the source files.
+- The Vite base path is configured for static hosting, so the generated build can load correctly on GitHub Pages.
 
 ## Scripts
 
