@@ -1,6 +1,6 @@
 function About({ about, careerObjective, education, skills, heroImage }) {
   return (
-    <section className="section about-section about-section--dark" id="about">
+    <section className="section about-section" id="about">
       <div className="about-panel">
         <div className="about-visual" aria-hidden="true">
           <div className="about-visual-frame">

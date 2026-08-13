@@ -1,15 +1,13 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SQUARE_ORIGIN, setChapterDark } from './ThemeBridge';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Expansion origin as % of the pinned stage — change to retarget. */
-export const SQUARE_ORIGIN = { x: 50, y: 50 };
-
+/** Same numbers as ThemeBridge enter */
 const BASE_SIZE = 104;
 const START_SCALE = 0.2;
-const CHAPTER_BG = '#141211';
 const LIGHT_BG = '#faf4ee';
 
 function easeProgress(p) {
@@ -20,21 +18,15 @@ function getCoverScale(basePx = BASE_SIZE) {
   return (Math.max(window.innerWidth, window.innerHeight) / basePx) * 1.35;
 }
 
-export function setChapterDark(on) {
-  document.documentElement.classList.toggle('chapter-dark', Boolean(on));
-}
-
 /**
- * Enter: dark square expands with About inside → dark chapter.
- * Exit: light square expands with Contact inside.
- * Same scrub/pin/scale system both ways. No empty kicker.
+ * Mirror of Hero → Dark square, inverted:
+ * dark stays put, cream square grows, Contact lives inside the square.
  */
-function ThemeBridge({ mode = 'enter', children }) {
+function ContactBridge({ children }) {
   const wrapRef = useRef(null);
   const stageRef = useRef(null);
   const squareRef = useRef(null);
   const contentRef = useRef(null);
-  const isExit = mode === 'exit';
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -47,30 +39,13 @@ function ThemeBridge({ mode = 'enter', children }) {
     if (!section) return undefined;
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-
     if (reduce.matches) {
       gsap.set([square, content], { clearProps: 'all' });
-
-      if (isExit) {
-        const st = ScrollTrigger.create({
-          trigger: wrap,
-          start: 'top 70%',
-          end: 'bottom 40%',
-          onEnter: () => setChapterDark(false),
-          onLeaveBack: () => setChapterDark(true),
-        });
-        return () => st.kill();
-      }
-
-      const chapter = document.querySelector('.dark-chapter');
       const st = ScrollTrigger.create({
         trigger: wrap,
-        start: 'top 75%',
-        end: () => (chapter ? 'bottom bottom' : 'bottom 25%'),
-        endTrigger: chapter || wrap,
-        onEnter: () => setChapterDark(true),
-        onLeaveBack: () => setChapterDark(false),
-        onEnterBack: () => setChapterDark(true),
+        start: 'top 70%',
+        onEnter: () => setChapterDark(false),
+        onLeaveBack: () => setChapterDark(true),
       });
       return () => st.kill();
     }
@@ -78,11 +53,15 @@ function ThemeBridge({ mode = 'enter', children }) {
     const ox = `${SQUARE_ORIGIN.x}%`;
     const oy = `${SQUARE_ORIGIN.y}%`;
 
+    // Cache once — live scrollHeight during scrub causes pin-distance jumps (glitches)
+    const contactHeight = Math.max(section.scrollHeight, window.innerHeight);
+
     const applyScale = (s, scrollY = 0, opacity = 1) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const lx = BASE_SIZE / 2 - vw / (2 * s);
-      const ly = BASE_SIZE / 2 - vh / (2 * s);
+      const safe = Math.max(s, 0.001);
+      const lx = BASE_SIZE / 2 - vw / (2 * safe);
+      const ly = BASE_SIZE / 2 - vh / (2 * safe);
 
       gsap.set(square, {
         width: BASE_SIZE,
@@ -91,7 +70,7 @@ function ThemeBridge({ mode = 'enter', children }) {
         top: oy,
         xPercent: -50,
         yPercent: -50,
-        scale: s,
+        scale: safe,
         transformOrigin: '50% 50%',
         force3D: true,
       });
@@ -99,8 +78,8 @@ function ThemeBridge({ mode = 'enter', children }) {
       gsap.set(content, {
         width: vw,
         x: lx,
-        y: ly + scrollY / s,
-        scale: 1 / s,
+        y: ly + scrollY / safe,
+        scale: 1 / safe,
         transformOrigin: '0 0',
         opacity,
         force3D: true,
@@ -108,21 +87,27 @@ function ThemeBridge({ mode = 'enter', children }) {
     };
 
     applyScale(START_SCALE, 0, 0);
+    setChapterDark(true);
+
+    let wasDark = true;
+    const syncNav = (wantDark) => {
+      if (wantDark === wasDark) return;
+      wasDark = wantDark;
+      setChapterDark(wantDark);
+    };
 
     const ctx = gsap.context(() => {
-      const getEnd = () => {
-        const expandRun = window.innerHeight * 1.7;
-        const h = section.scrollHeight;
-        const innerScroll = Math.max(0, h - window.innerHeight);
-        return expandRun + innerScroll;
-      };
+      // Fixed distance — same feel as enter (~1.7vh expand + contact overflow)
+      const expandRun = () => window.innerHeight * 1.7;
+      const innerScroll = () => Math.max(0, contactHeight - window.innerHeight);
 
       ScrollTrigger.create({
-        trigger: wrap,
+        // Pin when THIS page arrives — after the dark lead (not over GitHub)
+        trigger: stage,
         start: 'top top',
-        end: getEnd,
-        pin: stage,
-        scrub: 0.65,
+        end: () => `+=${expandRun() + innerScroll()}`,
+        pin: true,
+        scrub: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
@@ -135,25 +120,19 @@ function ThemeBridge({ mode = 'enter', children }) {
             const s = gsap.utils.interpolate(START_SCALE, cover, p);
             const opacity = gsap.utils.clamp(0, 1, (p - 0.05) / 0.3);
             applyScale(s, 0, opacity);
-
-            if (isExit) {
-              setChapterDark(p < 0.48);
-            } else {
-              setChapterDark(p > 0.45);
-            }
+            syncNav(p < 0.45);
           } else {
             const scrollP = (raw - expandPortion) / (1 - expandPortion);
-            const h = section.scrollHeight;
-            const maxY = Math.max(0, h - window.innerHeight);
+            const maxY = Math.max(0, contactHeight - window.innerHeight);
             applyScale(cover, -maxY * scrollP, 1);
-            setChapterDark(!isExit);
+            syncNav(false);
           }
         },
-        onLeave: () => setChapterDark(!isExit),
-        onEnterBack: () => setChapterDark(!isExit),
+        onLeave: () => syncNav(false),
+        onEnterBack: () => syncNav(false),
         onLeaveBack: () => {
           applyScale(START_SCALE, 0, 0);
-          setChapterDark(isExit);
+          syncNav(true);
         },
       });
     }, wrap);
@@ -161,38 +140,26 @@ function ThemeBridge({ mode = 'enter', children }) {
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', onResize);
 
+    // After fonts/layout, one refresh — not on every github paint mid-scroll
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 100);
+
     return () => {
+      window.clearTimeout(t);
       window.removeEventListener('resize', onResize);
       ctx.revert();
     };
-  }, [isExit]);
-
-  useEffect(() => {
-    if (isExit) return undefined;
-
-    const chapter = document.querySelector('.dark-chapter');
-    if (!chapter) return undefined;
-
-    const lock = ScrollTrigger.create({
-      trigger: chapter,
-      start: 'top 90%',
-      // Release before Contact bridge so exit theme isn't fighting this lock
-      end: 'bottom top',
-      onToggle: (self) => {
-        if (self.isActive) setChapterDark(true);
-      },
-    });
-
-    return () => lock.kill();
-  }, [isExit]);
+  }, []);
 
   return (
-    <div className={`theme-bridge theme-bridge--${mode}`} ref={wrapRef}>
+    <div className="theme-bridge theme-bridge--exit" ref={wrapRef}>
+      {/* Full dark page after GitHub — square starts on the page after this */}
+      <div className="contact-bridge-lead" aria-hidden="true" />
+
       <div className="theme-bridge-stage" ref={stageRef}>
         <div
-          className={`theme-bridge-square theme-bridge-square--${mode}`}
+          className="theme-bridge-square theme-bridge-square--exit"
           ref={squareRef}
-          style={{ background: isExit ? LIGHT_BG : CHAPTER_BG }}
+          style={{ background: LIGHT_BG }}
         >
           <div className="theme-bridge-content" ref={contentRef}>
             {children}
@@ -203,4 +170,4 @@ function ThemeBridge({ mode = 'enter', children }) {
   );
 }
 
-export default ThemeBridge;
+export default ContactBridge;

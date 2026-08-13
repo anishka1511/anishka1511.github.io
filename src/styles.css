@@ -597,7 +597,7 @@ p {
   color: var(--coral);
 }
 
-/* Theme bridge: pinned expanding-square reveal into dark About */
+/* Theme bridge: enter (dark + About) / exit (light + Contact) */
 .theme-bridge {
   position: relative;
   width: 100vw;
@@ -614,10 +614,28 @@ p {
   background: transparent;
 }
 
+.theme-bridge--enter .theme-bridge-stage {
+  /* Light hero / page shows around the expanding dark square */
+  background: transparent;
+}
+
+/* Exit twin: dark shows around the expanding cream square */
+.theme-bridge--exit .theme-bridge-stage {
+  background: #141211;
+}
+
+/* Empty dark page after GitHub — Contact square starts on the following page */
+.contact-bridge-lead {
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  background: #141211;
+  pointer-events: none;
+}
+
 .theme-bridge-square {
   position: absolute;
   z-index: 1;
-  background: #141211;
   overflow: hidden;
   border: 0;
   border-radius: 0;
@@ -632,7 +650,8 @@ p {
   will-change: transform, opacity;
 }
 
-.theme-bridge-content .about-section--dark {
+.theme-bridge-content .about-section,
+.theme-bridge-content .contact-section {
   width: 100%;
   margin: 0;
   min-height: 100vh;
@@ -640,10 +659,28 @@ p {
   box-sizing: border-box;
   padding-left: max(1.25rem, calc((100% - 1160px) / 2 + 1.25rem));
   padding-right: max(1.25rem, calc((100% - 1160px) / 2 + 1.25rem));
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
 }
 
-/* About — dark chapter (designed theme, not CSS invert) */
-.about-section--dark {
+.theme-bridge-content .contact-section {
+  background: #faf4ee;
+  color: #2f2925;
+}
+
+.theme-bridge-content .contact-section h2,
+.theme-bridge-content .contact-section .contact-lead,
+.theme-bridge-content .contact-section .contact-details,
+.theme-bridge-content .contact-section label {
+  color: #2f2925;
+}
+
+.theme-bridge-content .contact-section .section-label {
+  color: var(--coral);
+}
+
+/* About inside enter square — dark chapter tokens */
+.theme-bridge--enter .about-section {
   --chapter-bg: #141211;
   --chapter-surface: #1c1917;
   --chapter-ink: #f6efe8;
@@ -652,83 +689,234 @@ p {
   --chapter-accent-soft: rgba(233, 132, 106, 0.18);
   --chapter-line: rgba(246, 239, 232, 0.1);
 
-  position: relative;
-  color: var(--chapter-ink);
   background: var(--chapter-bg);
-  padding-top: 4.5rem;
-  padding-bottom: 4.5rem;
+  color: var(--chapter-ink);
 }
 
-.about-section--dark::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 12% 20%, rgba(233, 132, 106, 0.1), transparent 42%),
-    radial-gradient(circle at 88% 70%, rgba(243, 196, 200, 0.06), transparent 40%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.about-section--dark > * {
-  position: relative;
-  z-index: 1;
-}
-
-.about-section--dark .section-label {
+.theme-bridge--enter .about-section .section-label {
   color: var(--chapter-accent);
 }
 
-.about-section--dark h2,
-.about-section--dark h3 {
+.theme-bridge--enter .about-section h2,
+.theme-bridge--enter .about-section h3 {
   color: var(--chapter-ink);
 }
 
-.about-section--dark .about-panel {
+.theme-bridge--enter .about-panel {
   background: var(--chapter-surface);
   border-color: var(--chapter-line);
   box-shadow: none;
 }
 
-.about-section--dark .about-lead,
-.about-section--dark .education-degree,
-.about-section--dark .education-cgpa,
-.about-section--dark .focus-item h3 {
+.theme-bridge--enter .about-lead,
+.theme-bridge--enter .education-degree,
+.theme-bridge--enter .education-cgpa,
+.theme-bridge--enter .focus-item h3 {
   color: var(--chapter-ink);
 }
 
-.about-section--dark .about-objective,
-.about-section--dark .education-meta,
-.about-section--dark .focus-item p {
+.theme-bridge--enter .about-objective,
+.theme-bridge--enter .education-meta,
+.theme-bridge--enter .focus-item p {
   color: var(--chapter-ink-soft);
 }
 
-.about-section--dark .about-visual-frame {
+.theme-bridge--enter .about-visual-frame {
   background: #2a2420;
 }
 
-.about-section--dark .about-visual-blob {
+.theme-bridge--enter .about-visual-blob {
   background: var(--chapter-accent-soft);
 }
 
-.about-section--dark .education-chip {
+.theme-bridge--enter .education-chip {
   background: rgba(233, 132, 106, 0.1);
   border: 1px solid var(--chapter-line);
 }
 
-.about-section--dark .education-chip-label {
+.theme-bridge--enter .education-chip-label {
   color: var(--chapter-accent);
 }
 
-.about-section--dark .focus-dot {
+.theme-bridge--enter .focus-dot {
   border-color: rgba(233, 132, 106, 0.45);
   background: radial-gradient(circle at 40% 35%, rgba(233, 132, 106, 0.55), transparent 55%);
+}
+
+/* Dark chapter: Work → Experience → GitHub */
+.dark-chapter {
+  --chapter-bg: #141211;
+  --chapter-surface: #1c1917;
+  --chapter-surface-warm: #241e1a;
+  --chapter-ink: #f6efe8;
+  --chapter-ink-soft: #b8aea5;
+  --chapter-accent: #e9846a;
+  --chapter-accent-soft: rgba(233, 132, 106, 0.18);
+  --chapter-line: rgba(246, 239, 232, 0.1);
+
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: var(--chapter-bg);
+  color: var(--chapter-ink);
+}
+
+.dark-chapter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(233, 132, 106, 0.09), transparent 42%),
+    radial-gradient(circle at 88% 72%, rgba(243, 196, 200, 0.05), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark-chapter > * {
+  position: relative;
+  z-index: 1;
+  width: min(1160px, calc(100% - 2.5rem));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dark-chapter .section-label {
+  color: var(--chapter-accent);
+}
+
+.dark-chapter h2,
+.dark-chapter h3 {
+  color: var(--chapter-ink);
+}
+
+.dark-chapter p,
+.dark-chapter .section-intro {
+  color: var(--chapter-ink-soft);
+}
+
+/* Work inside dark chapter — keep pastel card accents, dark chrome */
+.dark-chapter .work-card {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.dark-chapter .work-card-category {
+  color: rgba(47, 41, 37, 0.55);
+}
+
+.dark-chapter .work-card-body h3,
+.dark-chapter .work-card-stack,
+.dark-chapter .work-card .work-card-link {
+  color: #2f2925;
+}
+
+.dark-chapter .work-card-desc {
+  color: #6a5f57;
+}
+
+.dark-chapter .work-card .work-card-link:hover {
+  color: var(--coral-deep);
+}
+
+/* Experience inside dark chapter */
+.dark-chapter .experience-band {
+  background: var(--chapter-surface);
+  border: 1px solid var(--chapter-line);
+}
+
+.dark-chapter .stat-pill {
+  background: rgba(246, 239, 232, 0.06);
+  border: 1px solid var(--chapter-line);
+}
+
+.dark-chapter .stat-pill strong {
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .stat-pill span {
+  color: var(--chapter-ink-soft);
+}
+
+.dark-chapter .experience-item {
+  border-bottom-color: var(--chapter-line);
+}
+
+.dark-chapter .experience-item h3,
+.dark-chapter .experience-item strong {
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .experience-item p {
+  color: var(--chapter-ink-soft);
+}
+
+.dark-chapter .achievement-item {
+  background: rgba(233, 132, 106, 0.14);
+  color: var(--chapter-ink);
+}
+
+/* GitHub inside dark chapter */
+.dark-chapter .github-panel {
+  background: var(--chapter-surface);
+  border: 1px solid var(--chapter-line);
+}
+
+.dark-chapter .github-avatar {
+  border-color: var(--chapter-surface-warm);
+}
+
+.dark-chapter .stat-item {
+  background: rgba(246, 239, 232, 0.05);
+  border: 1px solid var(--chapter-line);
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .github-repo-card {
+  background: var(--chapter-surface-warm);
+  border: 1px solid var(--chapter-line);
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .github-repo-card h3 {
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .github-repo-card a,
+.dark-chapter .github-repo-card .work-card-link {
+  color: var(--chapter-accent);
+}
+
+.dark-chapter .github-repo-card p {
+  color: var(--chapter-ink-soft);
+}
+
+.dark-chapter .github-panel h3 {
+  color: var(--chapter-ink);
+}
+
+.dark-chapter .github-panel p {
+  color: var(--chapter-ink-soft);
+}
+
+.dark-chapter .muted,
+.dark-chapter .error-text {
+  color: var(--chapter-ink-soft);
+}
+
+.dark-chapter .btn-primary {
+  background: var(--chapter-accent);
+  color: #1a1614;
+}
+
+.dark-chapter .btn-primary:hover {
+  background: #f09a7e;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .theme-bridge-stage {
     height: auto;
     overflow: visible;
+    background: transparent;
   }
 
   .theme-bridge-square {
@@ -741,18 +929,42 @@ p {
     overflow: visible;
   }
 
+  .theme-bridge--enter .theme-bridge-square {
+    background: #141211 !important;
+  }
+
   .theme-bridge-content {
     position: relative !important;
     transform: none !important;
     opacity: 1 !important;
     width: 100% !important;
   }
+
+  .theme-bridge-content .about-section,
+  .theme-bridge-content .contact-section {
+    min-height: 0;
+    padding-left: max(1.25rem, calc((100% - 1160px) / 2 + 1.25rem));
+    padding-right: max(1.25rem, calc((100% - 1160px) / 2 + 1.25rem));
+  }
+
+  .theme-bridge--exit .theme-bridge-square {
+    background: #faf4ee !important;
+  }
+
+  .contact-bridge-lead {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {
-  .theme-bridge-content .about-section--dark {
+  .theme-bridge-content .about-section,
+  .theme-bridge-content .contact-section {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+  }
+
+  .dark-chapter > * {
+    width: min(1160px, calc(100% - 2rem));
   }
 }
 

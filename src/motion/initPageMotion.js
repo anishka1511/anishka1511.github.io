@@ -44,9 +44,9 @@ export function initPageMotion() {
 }
 
 function setupReveals({ y, stagger, duration }) {
-  // About is revealed by ThemeBridge (expanding square) — skip here to avoid opacity fights.
+  // About / Contact are owned by ThemeBridge enter/exit — skip opacity fights.
   const sections = gsap.utils.toArray(
-    '.work-section, .experience-section, .github-section, .contact-section'
+    '.dark-chapter .work-section, .dark-chapter .experience-section, .dark-chapter .github-section'
   );
 
   sections.forEach((section) => {

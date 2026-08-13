@@ -3,6 +3,7 @@ import { portfolioData } from './portfolioData';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ThemeBridge from './components/ThemeBridge';
+import ContactBridge from './components/ContactBridge';
 import About from './components/About';
 import SelectedWork from './components/SelectedWork';
 import ExperienceStats from './components/ExperienceStats';
@@ -11,6 +12,9 @@ import Contact from './components/Contact';
 import { useSmoothScroll } from './motion/useSmoothScroll';
 import { initPageMotion } from './motion/initPageMotion';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const THEME_STORAGE_KEY = 'portfolio-theme';
 
@@ -91,7 +95,14 @@ function App() {
   useEffect(() => {
     const cleanup = initPageMotion();
     return cleanup;
-  }, [githubLoading, projects, experience]);
+  }, [projects, experience]);
+
+  // Github content changes page height — refresh pins without tearing down motion
+  useEffect(() => {
+    if (githubLoading) return undefined;
+    const id = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => window.cancelAnimationFrame(id);
+  }, [githubLoading]);
 
   const isDarkTheme = theme === 'dark';
   const handleLinkClick = () => setMenuOpen(false);
@@ -177,7 +188,7 @@ function App() {
             location={location}
           />
 
-          <ThemeBridge>
+          <ThemeBridge mode="enter">
             <About
               about={about}
               careerObjective={careerObjective}
@@ -187,31 +198,35 @@ function App() {
             />
           </ThemeBridge>
 
-          <SelectedWork projects={projects} />
+          <div className="dark-chapter">
+            <SelectedWork projects={projects} />
 
-          <ExperienceStats
-            experience={experience}
-            achievements={achievements}
-            projectCount={projects.length}
-          />
+            <ExperienceStats
+              experience={experience}
+              achievements={achievements}
+              projectCount={projects.length}
+            />
 
-          <GithubSection
-            loading={githubLoading}
-            error={githubError}
-            profile={githubProfile}
-            repos={githubRepos}
-            username={githubUsername}
-            profileUrl={links.github}
-          />
+            <GithubSection
+              loading={githubLoading}
+              error={githubError}
+              profile={githubProfile}
+              repos={githubRepos}
+              username={githubUsername}
+              profileUrl={links.github}
+            />
+          </div>
 
-          <Contact
-            location={location}
-            phone={phone}
-            links={links}
-            social={social}
-            careerObjective={careerObjective}
-            onSubmit={handleSubmit}
-          />
+          <ContactBridge>
+            <Contact
+              location={location}
+              phone={phone}
+              links={links}
+              social={social}
+              careerObjective={careerObjective}
+              onSubmit={handleSubmit}
+            />
+          </ContactBridge>
         </main>
       </div>
     </div>
