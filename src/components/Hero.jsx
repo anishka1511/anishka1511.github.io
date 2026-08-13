@@ -5,15 +5,19 @@ import {
   createHeroNameHover,
   splitNameToWords,
 } from '../interactions/createHeroNameHover';
+import CatEasterEgg from '../cats/CatEasterEgg';
 
 gsap.registerPlugin(ScrollTrigger);
 
 function Hero({ name, title, intro, heroImage, location }) {
   const sectionRef = useRef(null);
   const nameRef = useRef(null);
+  const contentRef = useRef(null);
+  const visualRef = useRef(null);
 
   const nameWords = useMemo(() => splitNameToWords(name), [name]);
 
+  // Stage 3: scroll-scrubbed name transform (preserved)
   useEffect(() => {
     const section = sectionRef.current;
     const nameEl = nameRef.current;
@@ -51,8 +55,8 @@ function Hero({ name, title, intro, heroImage, location }) {
         if (isDesktop) {
           tl.fromTo(
             nameEl,
-            { scale: 1, yPercent: 0, opacity: 1 },
-            { scale: 1.1, yPercent: -6, opacity: 1, duration: 0.35 }
+            { scale: 1, yPercent: 0 },
+            { scale: 1.1, yPercent: -6, duration: 0.35 }
           ).to(nameEl, {
             scale: 0.68,
             yPercent: -42,
@@ -62,8 +66,8 @@ function Hero({ name, title, intro, heroImage, location }) {
         } else {
           tl.fromTo(
             nameEl,
-            { scale: 1, yPercent: 0, opacity: 1 },
-            { scale: 1.04, yPercent: -4, opacity: 1, duration: 0.3 }
+            { scale: 1, yPercent: 0 },
+            { scale: 1.04, yPercent: -4, duration: 0.3 }
           ).to(nameEl, {
             scale: 0.86,
             yPercent: -22,
@@ -94,6 +98,95 @@ function Hero({ name, title, intro, heroImage, location }) {
     };
   }, []);
 
+  // Supporting hero content fades with scroll (does not drive the name)
+  useEffect(() => {
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const visual = visualRef.current;
+    if (!section || !content) return undefined;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionQuery.matches) return undefined;
+
+    const support = content.querySelectorAll(
+      '.eyebrow, .hero-role, .hero-subtitle, .hero-location, .hero-actions'
+    );
+
+    const ctx = gsap.context(() => {
+      gsap.to(support, {
+        opacity: 0,
+        y: -28,
+        ease: 'none',
+        stagger: 0.02,
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'center top',
+          scrub: true,
+        },
+      });
+
+      if (visual) {
+        gsap.to(visual, {
+          opacity: 0.25,
+          y: -40,
+          scale: 0.94,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Hero entrance
+  useEffect(() => {
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const visual = visualRef.current;
+    const nameEl = nameRef.current;
+    if (!section || !content) return undefined;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionQuery.matches) return undefined;
+
+    const eyebrow = content.querySelector('.eyebrow');
+    const role = content.querySelector('.hero-role');
+    const subtitle = content.querySelector('.hero-subtitle');
+    const locationEl = content.querySelector('.hero-location');
+    const actions = content.querySelector('.hero-actions');
+    const decor = section.querySelectorAll('.hero-decor');
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+      gsap.set([eyebrow, nameEl, role, subtitle, locationEl, actions, visual, decor], {
+        opacity: 0,
+      });
+      gsap.set([eyebrow, role, subtitle, locationEl, actions], { y: 18 });
+      // Name transform is owned by Stage 3 ScrollTrigger — entrance only fades it in
+      if (visual) gsap.set(visual, { y: 24, scale: 0.96 });
+      gsap.set(decor, { scale: 0.92 });
+
+      tl.to(eyebrow, { opacity: 1, y: 0, duration: 0.45 }, 0.08)
+        .to(nameEl, { opacity: 1, duration: 0.65 }, 0.16)
+        .to(role, { opacity: 1, y: 0, duration: 0.5 }, 0.32)
+        .to([subtitle, locationEl], { opacity: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0.4)
+        .to(actions, { opacity: 1, y: 0, duration: 0.45 }, 0.52)
+        .to(visual, { opacity: 1, y: 0, scale: 1, duration: 0.7 }, 0.22)
+        .to(decor, { opacity: 1, scale: 1, duration: 0.8, stagger: 0.05 }, 0.18);
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Letter hover (Stage 4)
   useEffect(() => {
     const nameEl = nameRef.current;
     if (!nameEl) return undefined;
@@ -115,9 +208,8 @@ function Hero({ name, title, intro, heroImage, location }) {
       <div className="hero-decor hero-decor-blob" aria-hidden="true" />
       <div className="hero-decor hero-decor-peach" aria-hidden="true" />
       <div className="hero-decor hero-decor-squiggle" aria-hidden="true" />
-      <div className="hero-play-space" aria-hidden="true" data-future="cat-interactions" />
 
-      <div className="hero-content">
+      <div className="hero-content" ref={contentRef}>
         <p className="eyebrow">Hello, I am</p>
         <h1 className="hero-name" ref={nameRef} aria-label={name} data-future="name-animation">
           <span className="hero-name-letters" aria-hidden="true">
@@ -146,12 +238,14 @@ function Hero({ name, title, intro, heroImage, location }) {
         </div>
       </div>
 
-      <div className="hero-visual">
+      <div className="hero-visual" ref={visualRef}>
         <div className="hero-portrait-glow" aria-hidden="true" />
         <div className="hero-portrait-frame">
           <img src={heroImage} alt={`${name} portrait`} className="hero-image" />
         </div>
-        <div className="hero-play-space hero-play-space-side" aria-hidden="true" />
+        <div className="hero-cat-slot" aria-hidden="true">
+          <CatEasterEgg id="heroPeek" className="cat-hero-peek" />
+        </div>
       </div>
     </section>
   );

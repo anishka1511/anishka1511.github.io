@@ -7,6 +7,9 @@ import SelectedWork from './components/SelectedWork';
 import ExperienceStats from './components/ExperienceStats';
 import GithubSection from './components/GithubSection';
 import Contact from './components/Contact';
+import { useSmoothScroll } from './motion/useSmoothScroll';
+import { initPageMotion } from './motion/initPageMotion';
+import gsap from 'gsap';
 
 const THEME_STORAGE_KEY = 'portfolio-theme';
 
@@ -53,10 +56,41 @@ function App() {
     return savedTheme === 'dark' ? 'dark' : 'light';
   });
 
+  useSmoothScroll();
+
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    const header = document.querySelector('.site-header');
+    if (!header) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduceMotion.matches) return undefined;
+
+    // Opacity-only: avoid transform on sticky header (breaks sticky / can leave nav invisible)
+    const tween = gsap.from(header, {
+      opacity: 0,
+      duration: 0.55,
+      ease: 'power2.out',
+      delay: 0.02,
+      onComplete: () => {
+        gsap.set(header, { clearProps: 'opacity,transform' });
+      },
+    });
+
+    return () => {
+      tween.kill();
+      gsap.set(header, { clearProps: 'opacity,transform' });
+    };
+  }, []);
+
+  useEffect(() => {
+    const cleanup = initPageMotion();
+    return cleanup;
+  }, [githubLoading, projects, experience]);
 
   const isDarkTheme = theme === 'dark';
   const handleLinkClick = () => setMenuOpen(false);
@@ -118,24 +152,6 @@ function App() {
 
     return () => controller.abort();
   }, [githubUsername]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-          }
-        });
-      },
-      { threshold: 0.14 }
-    );
-
-    const revealElements = document.querySelectorAll('.reveal-on-scroll');
-    revealElements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, [projects, experience, githubLoading]);
 
   return (
     <div className="page-wrap">

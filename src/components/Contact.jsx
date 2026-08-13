@@ -1,8 +1,9 @@
 import ExternalLink from './ExternalLink';
+import CatEasterEgg from '../cats/CatEasterEgg';
 
 function Contact({ location, phone, links, social, careerObjective, onSubmit }) {
   return (
-    <section className="section contact-section reveal-on-scroll" id="contact">
+    <section className="section contact-section" id="contact">
       <div className="contact-banner">
         <div className="contact-banner-copy">
           <p className="section-label">Contact</p>
@@ -34,6 +35,10 @@ function Contact({ location, phone, links, social, careerObjective, onSubmit }) 
             <span>{social.githubLabel}</span>
             <ExternalLink href={links.github}>{social.githubDisplay}</ExternalLink>
           </p>
+        </div>
+
+        <div className="contact-tail-slot" aria-hidden="true">
+          <CatEasterEgg id="contactTail" className="cat-contact-tail" />
         </div>
       </div>
 

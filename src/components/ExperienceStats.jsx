@@ -1,13 +1,19 @@
+import CatEasterEgg from '../cats/CatEasterEgg';
+
 function ExperienceStats({ experience, achievements, projectCount }) {
   const stats = [
-    { label: 'Projects', value: `${projectCount}` },
-    { label: 'Roles', value: `${experience.length}` },
-    { label: 'Highlights', value: `${achievements.length}` },
+    { label: 'Projects', value: projectCount },
+    { label: 'Roles', value: experience.length },
+    { label: 'Highlights', value: achievements.length },
   ];
 
   return (
-    <section className="section experience-section reveal-on-scroll" id="experience">
+    <section className="section experience-section" id="experience">
       <div className="experience-band">
+        <div className="experience-cat-edge" aria-hidden="true">
+          <CatEasterEgg id="edgeIdle" className="cat-edge-idle" />
+        </div>
+
         <div className="section-header-row">
           <div>
             <p className="section-label">Experience</p>
@@ -17,8 +23,8 @@ function ExperienceStats({ experience, achievements, projectCount }) {
 
         <div className="stats-row" aria-label="Portfolio statistics">
           {stats.map((stat) => (
-            <div className="stat-pill" key={stat.label}>
-              <strong>{stat.value}</strong>
+            <div className="stat-pill" key={stat.label} data-count={stat.value}>
+              <strong className="stat-value">0</strong>
               <span>{stat.label}</span>
             </div>
           ))}
@@ -27,7 +33,7 @@ function ExperienceStats({ experience, achievements, projectCount }) {
 
       <div className="experience-list">
         {experience.map((item) => (
-          <article className="experience-item reveal-on-scroll" key={item.title}>
+          <article className="experience-item" key={item.title}>
             <h3>{item.title}</h3>
             <p>{item.description}</p>
           </article>
@@ -38,7 +44,7 @@ function ExperienceStats({ experience, achievements, projectCount }) {
         <p className="section-label">Achievements</p>
         <ul className="achievement-list">
           {achievements.map((item) => (
-            <li className="achievement-item reveal-on-scroll" key={item}>
+            <li className="achievement-item" key={item}>
               {item}
             </li>
           ))}

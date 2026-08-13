@@ -9,7 +9,7 @@ function GithubSection({
   profileUrl,
 }) {
   return (
-    <section className="section github-section reveal-on-scroll" id="github">
+    <section className="section github-section" id="github">
       <div className="section-header-row">
         <div>
           <p className="section-label">GitHub</p>
@@ -21,7 +21,7 @@ function GithubSection({
       {error ? <p className="muted">{error}</p> : null}
 
       {profile && !error ? (
-        <div className="github-panel reveal-on-scroll">
+        <div className="github-panel">
           <div className="github-header">
             <img src={profile.avatar_url} alt="GitHub avatar" className="github-avatar" />
             <div>
@@ -52,7 +52,7 @@ function GithubSection({
       {repos.length ? (
         <div className="github-repos-grid">
           {repos.map((repo) => (
-            <article className="github-repo-card reveal-on-scroll" key={repo.id}>
+            <article className="github-repo-card" key={repo.id}>
               <h3>{repo.name}</h3>
               <p className="muted">
                 {repo.language || 'N/A'} · Updated {new Date(repo.updated_at).toLocaleDateString()}
