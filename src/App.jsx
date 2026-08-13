@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { portfolioData } from './portfolioData';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import ThemeBridge from './components/ThemeBridge';
 import About from './components/About';
 import SelectedWork from './components/SelectedWork';
 import ExperienceStats from './components/ExperienceStats';
@@ -176,13 +177,15 @@ function App() {
             location={location}
           />
 
-          <About
-            about={about}
-            careerObjective={careerObjective}
-            education={education}
-            skills={skills}
-            heroImage={heroImage}
-          />
+          <ThemeBridge>
+            <About
+              about={about}
+              careerObjective={careerObjective}
+              education={education}
+              skills={skills}
+              heroImage={heroImage}
+            />
+          </ThemeBridge>
 
           <SelectedWork projects={projects} />
 

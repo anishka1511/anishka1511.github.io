@@ -1,5 +1,4 @@
 import ExternalLink from './ExternalLink';
-import CatEasterEgg from '../cats/CatEasterEgg';
 
 function Contact({ location, phone, links, social, careerObjective, onSubmit }) {
   return (
@@ -35,10 +34,6 @@ function Contact({ location, phone, links, social, careerObjective, onSubmit }) 
             <span>{social.githubLabel}</span>
             <ExternalLink href={links.github}>{social.githubDisplay}</ExternalLink>
           </p>
-        </div>
-
-        <div className="contact-tail-slot" aria-hidden="true">
-          <CatEasterEgg id="contactTail" className="cat-contact-tail" />
         </div>
       </div>
 

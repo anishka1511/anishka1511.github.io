@@ -44,8 +44,9 @@ export function initPageMotion() {
 }
 
 function setupReveals({ y, stagger, duration }) {
+  // About is revealed by ThemeBridge (expanding square) — skip here to avoid opacity fights.
   const sections = gsap.utils.toArray(
-    '.about-section, .work-section, .experience-section, .github-section, .contact-section'
+    '.work-section, .experience-section, .github-section, .contact-section'
   );
 
   sections.forEach((section) => {

@@ -5,7 +5,6 @@ import {
   createHeroNameHover,
   splitNameToWords,
 } from '../interactions/createHeroNameHover';
-import CatEasterEgg from '../cats/CatEasterEgg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -242,9 +241,6 @@ function Hero({ name, title, intro, heroImage, location }) {
         <div className="hero-portrait-glow" aria-hidden="true" />
         <div className="hero-portrait-frame">
           <img src={heroImage} alt={`${name} portrait`} className="hero-image" />
-        </div>
-        <div className="hero-cat-slot" aria-hidden="true">
-          <CatEasterEgg id="heroPeek" className="cat-hero-peek" />
         </div>
       </div>
     </section>

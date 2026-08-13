@@ -1,16 +1,6 @@
-import CatEasterEgg from '../cats/CatEasterEgg';
-
 function About({ about, careerObjective, education, skills, heroImage }) {
   return (
-    <section className="section about-section" id="about">
-      <div className="about-cat-bridge" aria-hidden="true">
-        <CatEasterEgg
-          id="scrollReveal"
-          className="cat-scroll-reveal"
-          triggerSelector="#about"
-        />
-      </div>
-
+    <section className="section about-section about-section--dark" id="about">
       <div className="about-panel">
         <div className="about-visual" aria-hidden="true">
           <div className="about-visual-frame">
@@ -49,14 +39,6 @@ function About({ about, careerObjective, education, skills, heroImage }) {
             ))}
           </ul>
         </div>
-
-        <div className="about-tail-slot" aria-hidden="true">
-          <CatEasterEgg id="aboutTail" className="cat-about-tail" />
-        </div>
-      </div>
-
-      <div className="about-side-peek-slot" aria-hidden="true">
-        <CatEasterEgg id="sidePeek" className="cat-side-peek" />
       </div>
     </section>
   );

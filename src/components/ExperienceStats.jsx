@@ -1,5 +1,3 @@
-import CatEasterEgg from '../cats/CatEasterEgg';
-
 function ExperienceStats({ experience, achievements, projectCount }) {
   const stats = [
     { label: 'Projects', value: projectCount },
@@ -10,10 +8,6 @@ function ExperienceStats({ experience, achievements, projectCount }) {
   return (
     <section className="section experience-section" id="experience">
       <div className="experience-band">
-        <div className="experience-cat-edge" aria-hidden="true">
-          <CatEasterEgg id="edgeIdle" className="cat-edge-idle" />
-        </div>
-
         <div className="section-header-row">
           <div>
             <p className="section-label">Experience</p>
