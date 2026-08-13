@@ -8,7 +8,9 @@ import About from './components/About';
 import SelectedWork from './components/SelectedWork';
 import ExperienceStats from './components/ExperienceStats';
 import GithubSection from './components/GithubSection';
+import CodingProfilesLead from './components/CodingProfilesLead';
 import Contact from './components/Contact';
+import BgDecor from './components/BgDecor';
 import { useSmoothScroll } from './motion/useSmoothScroll';
 import { initPageMotion } from './motion/initPageMotion';
 import gsap from 'gsap';
@@ -49,6 +51,7 @@ function App() {
     projects,
     experience,
     achievements,
+    codechefProblemsSolved,
   } = portfolioData;
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -199,6 +202,8 @@ function App() {
           </ThemeBridge>
 
           <div className="dark-chapter">
+            <BgDecor variant="chapter" />
+
             <SelectedWork projects={projects} />
 
             <ExperienceStats
@@ -217,7 +222,17 @@ function App() {
             />
           </div>
 
-          <ContactBridge>
+          <ContactBridge
+            lead={
+              <CodingProfilesLead
+                leetcodeUsername={social.leetcodeDisplay}
+                leetcodeUrl={links.leetcode}
+                codechefUsername={social.codechefDisplay}
+                codechefUrl={links.codechef}
+                codechefProblemsSolved={codechefProblemsSolved}
+              />
+            }
+          >
             <Contact
               location={location}
               phone={phone}

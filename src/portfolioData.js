@@ -22,12 +22,17 @@ export const portfolioData = {
     github: 'https://github.com/anishka1511',
     linkedin: 'https://www.linkedin.com/in/anishka-pannalkar/',
     email: 'anishkapanna1511@gmail.com',
+    leetcode: 'https://leetcode.com/u/Dont_wanna_know/',
+    codechef: 'https://www.codechef.com/users/anishka1511',
   },
   social: {
     linkedinLabel: 'LinkedIn',
     githubLabel: 'GitHub',
     githubDisplay: 'github.com/anishka1511',
+    leetcodeDisplay: 'Dont_wanna_know',
+    codechefDisplay: 'anishka1511',
   },
+  codechefProblemsSolved: 38,
   skills: [
     {
       title: 'Programming',

@@ -9,7 +9,6 @@ export const SQUARE_ORIGIN = { x: 50, y: 50 };
 
 const BASE_SIZE = 104;
 const START_SCALE = 0.2;
-const CHAPTER_BG = '#141211';
 const LIGHT_BG = '#faf4ee';
 
 function easeProgress(p) {
@@ -25,7 +24,7 @@ export function setChapterDark(on) {
 }
 
 /**
- * Enter: dark square expands with About inside → dark chapter.
+ * Enter: square expands with About inside → chapter (pink–orange in light, charcoal in dark).
  * Exit: light square expands with Contact inside.
  * Same scrub/pin/scale system both ways. No empty kicker.
  */
@@ -192,7 +191,7 @@ function ThemeBridge({ mode = 'enter', children }) {
         <div
           className={`theme-bridge-square theme-bridge-square--${mode}`}
           ref={squareRef}
-          style={{ background: isExit ? LIGHT_BG : CHAPTER_BG }}
+          style={isExit ? { background: LIGHT_BG } : undefined}
         >
           <div className="theme-bridge-content" ref={contentRef}>
             {children}

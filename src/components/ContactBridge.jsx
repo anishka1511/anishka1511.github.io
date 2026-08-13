@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SQUARE_ORIGIN, setChapterDark } from './ThemeBridge';
+import BgDecor from './BgDecor';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,17 +20,19 @@ function getCoverScale(basePx = BASE_SIZE) {
 }
 
 /**
- * Mirror of Hero → Dark square, inverted:
- * dark stays put, cream square grows, Contact lives inside the square.
+ * Mirror of Hero → chapter square, inverted:
+ * chapter stays put, cream square grows, Contact lives inside the square.
  */
-function ContactBridge({ children }) {
+function ContactBridge({ children, lead = null }) {
   const wrapRef = useRef(null);
+  const leadRef = useRef(null);
   const stageRef = useRef(null);
   const squareRef = useRef(null);
   const contentRef = useRef(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
+    const leadEl = leadRef.current;
     const stage = stageRef.current;
     const square = squareRef.current;
     const content = contentRef.current;
@@ -41,6 +44,7 @@ function ContactBridge({ children }) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (reduce.matches) {
       gsap.set([square, content], { clearProps: 'all' });
+      if (leadEl) gsap.set(leadEl, { clearProps: 'all' });
       const st = ScrollTrigger.create({
         trigger: wrap,
         start: 'top 70%',
@@ -97,30 +101,48 @@ function ContactBridge({ children }) {
     };
 
     const ctx = gsap.context(() => {
-      // Fixed distance — same feel as enter (~1.7vh expand + contact overflow)
-      const expandRun = () => window.innerHeight * 1.7;
+      // Soften approach: fade CP lead as Contact stage arrives (no Y — avoids white seam)
+      if (leadEl) {
+        ScrollTrigger.create({
+          trigger: stage,
+          start: 'top 90%',
+          end: 'top top',
+          scrub: 0.7,
+          onUpdate: (self) => {
+            gsap.set(leadEl, {
+              opacity: 1 - self.progress * 0.4,
+            });
+          },
+          onLeaveBack: () => {
+            gsap.set(leadEl, { opacity: 1 });
+          },
+        });
+      }
+
+      // Longer expand + lagged scrub = less sudden than scrub:true
+      const expandRun = () => window.innerHeight * 2.15;
       const innerScroll = () => Math.max(0, contactHeight - window.innerHeight);
 
       ScrollTrigger.create({
-        // Pin when THIS page arrives — after the dark lead (not over GitHub)
         trigger: stage,
         start: 'top top',
         end: () => `+=${expandRun() + innerScroll()}`,
         pin: true,
-        scrub: true,
+        scrub: 0.85,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          const expandPortion = 0.55;
+          const expandPortion = 0.62;
           const raw = self.progress;
           const cover = getCoverScale();
 
           if (raw <= expandPortion) {
             const p = easeProgress(raw / expandPortion);
             const s = gsap.utils.interpolate(START_SCALE, cover, p);
-            const opacity = gsap.utils.clamp(0, 1, (p - 0.05) / 0.3);
+            // Gentler fade-in across the first half of expand
+            const opacity = gsap.utils.clamp(0, 1, p / 0.42);
             applyScale(s, 0, opacity);
-            syncNav(p < 0.45);
+            syncNav(p < 0.52);
           } else {
             const scrollP = (raw - expandPortion) / (1 - expandPortion);
             const maxY = Math.max(0, contactHeight - window.innerHeight);
@@ -133,6 +155,7 @@ function ContactBridge({ children }) {
         onLeaveBack: () => {
           applyScale(START_SCALE, 0, 0);
           syncNav(true);
+          if (leadEl) gsap.set(leadEl, { opacity: 1 });
         },
       });
     }, wrap);
@@ -140,11 +163,13 @@ function ContactBridge({ children }) {
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', onResize);
 
-    // After fonts/layout, one refresh — not on every github paint mid-scroll
+    // After fonts/layout + async CP cards, refresh pin metrics
     const t = window.setTimeout(() => ScrollTrigger.refresh(), 100);
+    const t2 = window.setTimeout(() => ScrollTrigger.refresh(), 800);
 
     return () => {
       window.clearTimeout(t);
+      window.clearTimeout(t2);
       window.removeEventListener('resize', onResize);
       ctx.revert();
     };
@@ -152,8 +177,11 @@ function ContactBridge({ children }) {
 
   return (
     <div className="theme-bridge theme-bridge--exit" ref={wrapRef}>
-      {/* Full dark page after GitHub — square starts on the page after this */}
-      <div className="contact-bridge-lead" aria-hidden="true" />
+      {/* Full page after GitHub — square starts on the page after this */}
+      <div className="contact-bridge-lead" ref={leadRef}>
+        <BgDecor variant="lead" />
+        {lead}
+      </div>
 
       <div className="theme-bridge-stage" ref={stageRef}>
         <div
