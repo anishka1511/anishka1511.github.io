@@ -73,8 +73,18 @@ Edit `src/portfolioData.js`:
 
 - This project currently uses static data from `src/portfolioData.js`.
 - Contact form is UI-only and does not send data to a backend yet.
-- When deploying to GitHub Pages, publish the built `dist/` folder, not the source files.
-- The Vite base path is configured for static hosting, so the generated build can load correctly on GitHub Pages.
+- Deploy with GitHub Actions (`.github/workflows/deploy.yml`), which builds and publishes `dist/`.
+
+## GitHub Pages (required setting)
+
+The MIME error (`text/jsx`) means Pages is serving the **source** repo instead of the Actions build.
+
+1. Open: https://github.com/anishka1511/anishka1511.github.io/settings/pages
+2. Under **Build and deployment → Source**, choose **GitHub Actions** (not “Deploy from a branch”).
+3. Open the **Actions** tab → **Deploy to GitHub Pages** → **Re-run** the latest successful workflow (or push a commit).
+4. Wait 1–2 minutes, then hard-refresh https://anishka1511.github.io/
+
+You should see hashed assets like `/assets/index-….js`, **not** `/src/main.jsx`.
 
 ## Scripts
 
