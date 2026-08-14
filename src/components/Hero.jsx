@@ -207,7 +207,6 @@ function Hero({ name, title, intro, heroImage, location }) {
     <section className="hero section" id="hero" ref={sectionRef}>
       <div className="hero-decor hero-decor-blob" aria-hidden="true" />
       <div className="hero-decor hero-decor-peach" aria-hidden="true" />
-      <div className="hero-decor hero-decor-squiggle" aria-hidden="true" />
       <BgDecor variant="hero" />
 
       <div className="hero-content" ref={contentRef}>

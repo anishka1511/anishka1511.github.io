@@ -9,7 +9,6 @@ gsap.registerPlugin(ScrollTrigger);
 /** Same numbers as ThemeBridge enter */
 const BASE_SIZE = 104;
 const START_SCALE = 0.2;
-const LIGHT_BG = '#faf4ee';
 
 function easeProgress(p) {
   return p * p * (3 - 2 * p);
@@ -187,7 +186,6 @@ function ContactBridge({ children, lead = null }) {
         <div
           className="theme-bridge-square theme-bridge-square--exit"
           ref={squareRef}
-          style={{ background: LIGHT_BG }}
         >
           <div className="theme-bridge-content" ref={contentRef}>
             {children}

@@ -137,13 +137,18 @@ export function createHeroNameHover({
     item.setY(item.y);
     item.setR(item.r);
     item.setS(item.s);
-    const coral = 233;
-    const peachR = 246;
-    const g = Math.round(132 + (196 - 132) * item.tint);
-    const b = Math.round(106 + (200 - 106) * item.tint);
     const mix = item.tint;
     if (mix > 0.02) {
-      item.el.style.color = `rgb(${Math.round(47 + (coral - 47) * mix * 0.85)}, ${Math.round(41 + (g - 41) * mix)}, ${Math.round(37 + (b - 37) * mix)})`;
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        // Cream ink → coral (same hover feel, dark palette preserved)
+        item.el.style.color = `rgb(${Math.round(246 + (233 - 246) * mix * 0.85)}, ${Math.round(239 + (132 - 239) * mix)}, ${Math.round(232 + (106 - 232) * mix)})`;
+      } else {
+        const coral = 233;
+        const g = Math.round(132 + (196 - 132) * mix);
+        const b = Math.round(106 + (200 - 106) * mix);
+        item.el.style.color = `rgb(${Math.round(47 + (coral - 47) * mix * 0.85)}, ${Math.round(41 + (g - 41) * mix)}, ${Math.round(37 + (b - 37) * mix)})`;
+      }
     } else {
       item.el.style.color = '';
     }
